@@ -14,6 +14,11 @@ type Config struct {
 	DBPass    string
 	DBName    string
 	DBSslMode string
+	RedisHost string
+	RedisPort string
+	RedisPass string
+	RedisName string
+	Name      string
 }
 
 func LoadConfig() *Config {
@@ -29,6 +34,10 @@ func LoadConfig() *Config {
 		DBPass:    os.Getenv("DB_PASS"),
 		DBName:    os.Getenv("DB_NAME"),
 		DBSslMode: os.Getenv("DB_SSL_MODE"),
+		RedisHost: os.Getenv("REDIS_HOST"),
+		RedisPort: os.Getenv("REDIS_PORT"),
+		RedisPass: os.Getenv("REDIS_PASS"),
+		RedisName: os.Getenv("REDIS_NAME"),
 	}
 	return &config
 }

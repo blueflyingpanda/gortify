@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 )
 
 type PingPongResponse struct {
@@ -112,6 +113,12 @@ func RedirectHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	cachedUrl, err := rdb.Get(ctx, code).Result()
+	if err == nil {
+		http.Redirect(w, r, cachedUrl, http.StatusFound)
+		return
+	}
+
 	url, err := db.GetUrl(code)
 	if err != nil {
 		resp := ErrorResponse{"Not found"}
@@ -120,6 +127,7 @@ func RedirectHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	rdb.Set(ctx, code, url, 60*time.Second)
 	http.Redirect(w, r, *url, http.StatusFound)
 }
 
@@ -131,6 +139,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	InitRedis()
 
 	http.HandleFunc("/ping", PingPongHandler)
 	http.HandleFunc("/shortify", ShortifyHandler)
