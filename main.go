@@ -113,10 +113,12 @@ func RedirectHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cachedUrl, err := rdb.Get(ctx, code).Result()
-	if err == nil {
-		http.Redirect(w, r, cachedUrl, http.StatusFound)
-		return
+	if rdb != nil {
+		cachedUrl, err := rdb.Get(ctx, code).Result()
+		if err == nil {
+			http.Redirect(w, r, cachedUrl, http.StatusFound)
+			return
+		}
 	}
 
 	url, err := db.GetUrl(code)
@@ -127,7 +129,9 @@ func RedirectHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rdb.Set(ctx, code, url, 60*time.Second)
+	if rdb != nil {
+		rdb.Set(ctx, code, *url, 60*time.Second)
+	}
 	http.Redirect(w, r, *url, http.StatusFound)
 }
 

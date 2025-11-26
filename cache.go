@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"strconv"
 
 	"github.com/redis/go-redis/v9"
@@ -22,6 +23,7 @@ func InitRedis() {
 
 	_, err = rdb.Ping(ctx).Result()
 	if err != nil {
-		panic(err)
+		log.Println("redis not available:", err)
+		rdb = nil
 	}
 }
